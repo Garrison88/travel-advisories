@@ -1,15 +1,9 @@
 package com.thomas.garrison.traveladvisories.database
 
 import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.Room
+import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-
-
-//@Database(entities = [Trip::class], version = 1, exportSchema = false)
-//abstract class AppDatabase : RoomDatabase() {
-//    abstract fun tripDao(): TripDao
-//}
 
 @Database(entities = [Trip::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

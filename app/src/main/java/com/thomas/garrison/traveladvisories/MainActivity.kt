@@ -1,17 +1,18 @@
 package com.thomas.garrison.traveladvisories
 
 import android.net.Uri
+import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_main.*
-import android.arch.persistence.room.Room
 import com.thomas.garrison.traveladvisories.database.AppDatabase
+import kotlinx.android.synthetic.main.activity_main.*
+
+
 
 class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteractionListener, TripsFragment.OnFragmentInteractionListener {
     override fun onFragmentInteraction(uri: Uri) {
@@ -39,8 +40,11 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        database
 
-        MainActivity.database =  Room.databaseBuilder(this, AppDatabase::class.java, "travel-advisories-db").build()
+        MainActivity.database = AppDatabase.getAppDatabase(this)
+
+
 
         setSupportActionBar(toolbar)
         // Create the adapter that will return a fragment for each of the three

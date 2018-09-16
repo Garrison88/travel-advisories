@@ -8,7 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.Spinner
 import com.thomas.garrison.traveladvisories.database.Trip
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,8 +31,6 @@ class AddTripDialogFragment : DialogFragment() {
         val rootView = inflater.inflate(R.layout.fragment_add_trip, container)
 
         val btnChooseStartDate = rootView.findViewById<Button>(R.id.btn_start_date)
-//        val textView = rootView.findViewById<TextView>(R.id.textView)
-//        Log.d("$%$%$%", com.thomas.garrison.traveladvisories.database?.tripDao()?.getAllTrips().toString())
         val btnChooseEndDate = rootView.findViewById<Button>(R.id.btn_end_date)
         val countriesSpinner = rootView.findViewById<Spinner>(R.id.spinner_countries)
         val btnSave = rootView.findViewById<Button>(R.id.btn_save)

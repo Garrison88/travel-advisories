@@ -1,8 +1,9 @@
 package com.thomas.garrison.traveladvisories
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.thomas.garrison.traveladvisories.MainActivity.Companion.database
 import com.thomas.garrison.traveladvisories.database.Trip
 
 
@@ -17,6 +18,6 @@ class TripViewModel : ViewModel() {
     }
 
     private fun loadTrips() {
-//        com.thomas.garrison.traveladvisories.database.tripDao().getAllTrips()
+        trips = database?.tripDao()?.getAllTrips() as MutableLiveData<List<Trip>>?
     }
 }

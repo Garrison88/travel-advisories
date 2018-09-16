@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.thomas.garrison.traveladvisories.MainActivity.Companion.database
-import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.fragment_trips.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -35,20 +34,19 @@ class TripsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Runnable {
-        val tripList = ArrayList<Trip>()
-        tripList.add(Trip(100411, "Canada", "Sept 5, 2018", "Oct 10, 2018"))
-        tripList.add(Trip(1004, "Bermuda", "Sept 13, 2018", "Oct 16, 2018"))
-        tripList.add(Trip(100, "Canada", "Sept 28, 2018", "Nov 26, 2018"))
+
+//        val tripList = ArrayList<Trip>()
+//        tripList.add(Trip(100411, "Canada", "Sept 5, 2018", "Oct 10, 2018"))
+//        tripList.add(Trip(1004, "Bermuda", "Sept 13, 2018", "Oct 16, 2018"))
+//        tripList.add(Trip(100, "Canada", "Sept 28, 2018", "Nov 26, 2018"))
 //
-            rv_trips.layoutManager = LinearLayoutManager(context)
-            rv_trips.hasFixedSize()
-            rv_trips.adapter = TripAdapter(tripList)
-        }
-
-//        }
-//        Log.v("RILLRILL", com.thomas.garrison.traveladvisories.database!!.tripDao().getAllTrips().toString())
-
+//        val model = ViewModelProviders.of(this).get(TripViewModel::class.java)
+//        model.getTrips().observe(this, {  ->
+//
+//        })
+        rv_trips.layoutManager = LinearLayoutManager(context)
+        rv_trips.hasFixedSize()
+        rv_trips.adapter = TripAdapter(database?.tripDao()?.getAllTrips())
     }
 
     override fun onAttach(context: Context) {
