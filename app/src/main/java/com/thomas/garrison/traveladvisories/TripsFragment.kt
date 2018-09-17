@@ -1,5 +1,7 @@
 package com.thomas.garrison.traveladvisories
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -8,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.thomas.garrison.traveladvisories.MainActivity.Companion.database
 import kotlinx.android.synthetic.main.fragment_trips.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -40,13 +41,28 @@ class TripsFragment : Fragment() {
 //        tripList.add(Trip(1004, "Bermuda", "Sept 13, 2018", "Oct 16, 2018"))
 //        tripList.add(Trip(100, "Canada", "Sept 28, 2018", "Nov 26, 2018"))
 //
-//        val model = ViewModelProviders.of(this).get(TripViewModel::class.java)
+//
 //        model.getTrips().observe(this, {  ->
 //
 //        })
-        rv_trips.layoutManager = LinearLayoutManager(context)
-        rv_trips.hasFixedSize()
-        rv_trips.adapter = TripAdapter(database?.tripDao()?.getAllTrips())
+
+//        val model = ViewModelProviders.of(this).get(TripViewModel::class.java)
+//        val tripsArray = model.getTrips()
+//        tripsArray.observe(this, object: Observer<List<Trip>> {
+//            override fun onChanged(t: List<Trip>?) {
+//                tripsArray.removeObserver(this)
+//            }
+//        })
+
+        val tripViewModel = ViewModelProviders.of(this).get(TripViewModel::class.java)
+        tripViewModel.getTrips().observe(this, Observer {
+            // Update the UI
+            rv_trips.layoutManager = LinearLayoutManager(context)
+            rv_trips.hasFixedSize()
+            rv_trips.adapter = TripAdapter(tripViewModel.getTrips())
+        })
+
+
     }
 
     override fun onAttach(context: Context) {

@@ -21,3 +21,19 @@ class TripViewModel : ViewModel() {
         trips = database?.tripDao()?.getAllTrips() as MutableLiveData<List<Trip>>?
     }
 }
+
+//class WordViewModel(application: Application) : AndroidViewModel(application) {
+//
+////    private val mRepository: TrRepository
+//
+//    internal val allWords: LiveData<List<Trip>>
+//
+//    init {
+////        mRepository = WordRepository(application)
+//        allWords = mRepository.getAllWords()
+//    }
+//
+//    fun insert(word: Word) {
+//        mRepository.insert(word)
+//    }
+//}
