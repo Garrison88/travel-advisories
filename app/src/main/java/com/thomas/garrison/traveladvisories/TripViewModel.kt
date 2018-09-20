@@ -1,24 +1,23 @@
 package com.thomas.garrison.traveladvisories
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.thomas.garrison.traveladvisories.MainActivity.Companion.database
 import com.thomas.garrison.traveladvisories.database.Trip
 
 
 class TripViewModel : ViewModel() {
-    private var trips: MutableLiveData<List<Trip>>? = null
+    private var trips: LiveData<List<Trip>>? = null
     fun getTrips(): LiveData<List<Trip>> {
         if (trips == null) {
-            trips = MutableLiveData()
+//            trips = LiveData()
             loadTrips()
         }
-        return trips as MutableLiveData<List<Trip>>
+        return trips as LiveData<List<Trip>>
     }
 
     private fun loadTrips() {
-        trips = database?.tripDao()?.getAllTrips() as MutableLiveData<List<Trip>>?
+        trips = database?.tripDao()?.getAllTrips() as LiveData<List<Trip>>?
     }
 }
 

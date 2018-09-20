@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.fragment_trips.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -36,6 +37,9 @@ class TripsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        rv_trips.layoutManager = LinearLayoutManager(context)
+        rv_trips.hasFixedSize()
+
 //        val tripList = ArrayList<Trip>()
 //        tripList.add(Trip(100411, "Canada", "Sept 5, 2018", "Oct 10, 2018"))
 //        tripList.add(Trip(1004, "Bermuda", "Sept 13, 2018", "Oct 16, 2018"))
@@ -55,14 +59,22 @@ class TripsFragment : Fragment() {
 //        })
 
         val tripViewModel = ViewModelProviders.of(this).get(TripViewModel::class.java)
-        tripViewModel.getTrips().observe(this, Observer {
-            // Update the UI
-            rv_trips.layoutManager = LinearLayoutManager(context)
-            rv_trips.hasFixedSize()
-            rv_trips.adapter = TripAdapter(tripViewModel.getTrips())
+        subscribeUi(tripViewModel)
+    }
+
+    private fun subscribeUi(viewModel: TripViewModel) {
+        // Update the list when the data changes
+        viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
+            if (trips != null) {
+//                    mBinding.setIsLoading(false)
+                rv_trips.adapter = TripAdapter(trips)
+            } else {
+//                mBinding.setIsLoading(true)
+            }
+            // espresso does not know how to wait for data binding's loop so we execute changes
+            // sync.
+//            mBinding.executePendingBindings()
         })
-
-
     }
 
     override fun onAttach(context: Context) {
