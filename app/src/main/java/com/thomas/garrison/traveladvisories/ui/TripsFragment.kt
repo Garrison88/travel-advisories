@@ -1,12 +1,20 @@
-package com.thomas.garrison.traveladvisories
+package com.thomas.garrison.traveladvisories.ui
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.thomas.garrison.traveladvisories.R
+import com.thomas.garrison.traveladvisories.TripAdapter
+import com.thomas.garrison.traveladvisories.TripViewModel
+import com.thomas.garrison.traveladvisories.database.Trip
+import kotlinx.android.synthetic.main.fragment_trips.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -17,22 +25,41 @@ private const val ARG_PARAM2 = "param2"
 /**
  * A simple [Fragment] subclass.
  * Activities that contain this fragment must implement the
- * [AdvisoriesFragment.OnFragmentInteractionListener] interface
+ * [TripsFragment.OnFragmentInteractionListener] interface
  * to handle interaction events.
  *
  */
-class AdvisoriesFragment : Fragment() {
+class TripsFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_advisories, container, false)
+
+
+
+        return inflater.inflate(R.layout.fragment_trips, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        rv_trips.layoutManager = LinearLayoutManager(context)
+        rv_trips.hasFixedSize()
+
+        val tripViewModel = ViewModelProviders.of(this).get(TripViewModel::class.java)
+        subscribeUi(tripViewModel)
+
+    }
+
+    private fun subscribeUi(viewModel: TripViewModel) {
+        // Update the list when the data changes
+        viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
+            if (trips != null) {
+                rv_trips.adapter = TripAdapter(trips)
+            } else {
+
+            }
+        })
     }
 
     override fun onAttach(context: Context) {
@@ -57,7 +84,7 @@ class AdvisoriesFragment : Fragment() {
         // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
-                AdvisoriesFragment().apply {
+                TripsFragment().apply {
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
                     }

@@ -17,8 +17,6 @@ abstract class AppDatabase : RoomDatabase() {
         fun getAppDatabase(context: Context): AppDatabase {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "trip_advisories_db")
-                        // allow queries on the main thread.
-                        // Don't do this on a real app! See PersistenceBasicSample for an example.
                         .allowMainThreadQueries()
                         .build()
             }
@@ -30,28 +28,3 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
-
-//@Database(entities = [Trip::class], version = 1)
-//abstract class AppDatabase : RoomDatabase() {
-//
-//    abstract fun tripDao(): TripDao
-//
-//    companion object {
-//
-//        @Volatile
-//        private var INSTANCE: AppDatabase? = null
-//
-//        internal fun getDatabase(context: Context): AppDatabase? {
-//            if (INSTANCE == null) {
-//                synchronized(AppDatabase::class.java) {
-//                    if (INSTANCE == null) {
-//                        INSTANCE = Room.databaseBuilder(context.applicationContext,
-//                                AppDatabase::class.java, "travel-advisories-db")
-//                                .build()
-//                    }
-//                }
-//            }
-//            return INSTANCE
-//        }
-//    }
-//}

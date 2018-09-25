@@ -1,4 +1,4 @@
-package com.thomas.garrison.traveladvisories
+package com.thomas.garrison.traveladvisories.ui
 
 import android.net.Uri
 import android.os.Bundle
@@ -9,14 +9,14 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.thomas.garrison.traveladvisories.R
 import com.thomas.garrison.traveladvisories.database.AppDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-
 class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteractionListener, TripsFragment.OnFragmentInteractionListener {
     override fun onFragmentInteraction(uri: Uri) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     /**
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        MainActivity.database = AppDatabase.getAppDatabase(this)
+        database = AppDatabase.getAppDatabase(this)
 
         setSupportActionBar(toolbar)
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
         fab.setOnClickListener { addTripFragment.show(fm, "AddTripFragment_tag") }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -59,9 +60,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
 
         if (id == R.id.action_settings) {
@@ -78,9 +76,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment? {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-//            return PlaceholderFragment.newInstance(position + 1)
             return when(position) {
                 0 -> {
                     TripsFragment.newInstance(position + 1)
@@ -95,7 +90,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         }
 
         override fun getCount(): Int {
-            // Show 2 total pages.
+            // Show 2 total pages
             return 2
         }
     }

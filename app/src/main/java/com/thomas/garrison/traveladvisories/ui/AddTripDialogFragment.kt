@@ -1,15 +1,15 @@
-package com.thomas.garrison.traveladvisories
+package com.thomas.garrison.traveladvisories.ui
 
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Spinner
+import com.thomas.garrison.traveladvisories.R
 import com.thomas.garrison.traveladvisories.database.Trip
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +37,7 @@ class AddTripDialogFragment : DialogFragment() {
         val btnCancel = rootView.findViewById<Button>(R.id.btn_cancel)
 
         btnSave.setOnClickListener {
-            addTrip(countriesSpinner.selectedItem.toString(), btnChooseStartDate.text.toString(), btnChooseEndDate.text.toString())
+            addTrip(countriesSpinner.selectedItem.toString(), "Starts on " + btnChooseStartDate.text.toString(), "Ends on " + btnChooseEndDate.text.toString())
             dismiss()
         }
 
@@ -61,7 +61,6 @@ class AddTripDialogFragment : DialogFragment() {
         val trip = Trip(0, country, startDate, endDate)
 
         MainActivity.database?.tripDao()?.insert(trip)
-        Log.d("%&%&%", "${trip.country}, ${trip.startDate}, ${trip.endDate}")
     }
 
     private fun pickDate(btn : Button) {
