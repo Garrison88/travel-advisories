@@ -9,15 +9,24 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import com.google.gson.GsonBuilder
 import com.thomas.garrison.traveladvisories.R
+import com.thomas.garrison.traveladvisories.api.ScruffService
+import com.thomas.garrison.traveladvisories.api.CountriesWithAdvisories
 import com.thomas.garrison.traveladvisories.database.AppDatabase
 import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,6 +48,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
     companion object {
         var database: AppDatabase? = null
+        var countriesWithAdvisories = arrayListOf<String>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +66,55 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
         fab.setOnClickListener { openAddTripDialog() }
 
+        getAdvisories()
+
     }
+
+    private fun getAdvisories() {
+
+        val gson = GsonBuilder()
+                .setLenient()
+                .create()
+
+        val retrofit = Retrofit.Builder()
+                .baseUrl(ScruffService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build()
+
+        val service = retrofit.create(ScruffService::class.java)
+
+        val advisories = service.advisories
+
+        advisories.enqueue(object : Callback<CountriesWithAdvisories> {
+
+            override fun onResponse(call: Call<CountriesWithAdvisories>?, response: Response<CountriesWithAdvisories>?) {
+
+                if (response != null && response.isSuccessful && response.body() != null) {
+//
+//                    for (advisory in response.body()!!.Africa) {
+//                        Log.d("Africa: ", advisory)
+//                        countriesWithAdvisories.add(advisory)
+//                    }
+//                    val countriesWithAdvisories = ArrayList<String>()
+
+                    countriesWithAdvisories.addAll(response.body()!!.africa)
+                    countriesWithAdvisories.addAll(response.body()!!.asia)
+                    countriesWithAdvisories.addAll(response.body()!!.latinAmericaAndCaribbean)
+                    countriesWithAdvisories.addAll(response.body()!!.oceania)
+                    countriesWithAdvisories.addAll(response.body()!!.europe)
+
+                    Log.d("STUFF", countriesWithAdvisories.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<CountriesWithAdvisories>?, t: Throwable?) {
+
+                Log.d("Error ", t?.message)
+
+            }
+        })
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -81,12 +139,12 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment? {
-            return when(position) {
+            return when (position) {
                 0 -> {
                     TripsFragment.newInstance(position + 1)
                 }
                 1 -> {
-                    AdvisoriesFragment.newInstance(position + 1)
+                    AdvisoriesFragment.newInstance(position + 1, countriesWithAdvisories)
                 }
                 else -> {
                     null
@@ -100,14 +158,16 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         }
     }
 
-    private fun openAddTripDialog () {
+
+    private fun openAddTripDialog() {
 
         val dialogBuilder = AlertDialog.Builder(this)
 
         val dialogView = layoutInflater.inflate(R.layout.fragment_add_trip, null)
 
-        val countriesArray = resources.getStringArray(R.array.countries_array)
-        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, countriesArray)
+        val countryNamesArray = resources.getStringArray(R.array.country_names)
+        val countryCodesArray = resources.getStringArray(R.array.country_codes)
+        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, countryNamesArray)
         val autoCompleteTextView = dialogView.findViewById<AutoCompleteTextView>(R.id.auto_tv_countries)
         autoCompleteTextView.threshold = 1
         autoCompleteTextView.setAdapter(adapter)
@@ -115,34 +175,33 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         val btnChooseStartDate = dialogView.findViewById<Button>(R.id.btn_start_date)
         val btnChooseEndDate = dialogView.findViewById<Button>(R.id.btn_end_date)
 
-        var startTime = 0
-        var endTime = 0
-
         btnChooseStartDate.setOnClickListener {
-            startTime = pickDate(btnChooseStartDate)
+            pickDate(btnChooseStartDate)
         }
         btnChooseEndDate.setOnClickListener {
-            endTime = pickDate(btnChooseEndDate)
+            pickDate(btnChooseEndDate)
         }
 
         dialogBuilder.setView(dialogView)
 
                 .setPositiveButton("Save") { dialog, id ->
-//                    Log.d("$#@!", startTime.toString())
-//                    Log.d("$#@!", endTime.toString())
-//                    if (startTime < endTime) {
-                        addTrip(autoCompleteTextView.text.toString(),
-                                "Starts on" + btnChooseStartDate.text.toString(),
-                                "Ends on" + btnChooseEndDate.text.toString())
-                        dialog.dismiss()
-//                    } else {
-//                        Toast.makeText(applicationContext, "Try again", Toast.LENGTH_SHORT).show()
-//                    }
+
+                    val chosenCountry = autoCompleteTextView.text.toString()
+                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
+                    val hasAdvisory = countriesWithAdvisories.contains(chosenCountryCode)
+
+                    addTrip(chosenCountry,
+                            chosenCountryCode,
+                            btnChooseStartDate.text.toString(),
+                            btnChooseEndDate.text.toString(),
+                            hasAdvisory)
+                    dialog.dismiss()
                 }
 
-                .setNegativeButton("Cancel") { dialog, id ->
+                .setNeutralButton("Cancel") { dialog, id ->
                     dialog.cancel()
                 }
+
                 .setCancelable(false)
 
         val alert = dialogBuilder.create()
@@ -150,31 +209,28 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         alert.show()
     }
 
-    private fun addTrip(country: String, startDate: String, endDate: String) {
-        val trip = Trip(0, country, startDate, endDate)
+    private fun addTrip(country: String, countryCode: String, startDate: String, endDate: String, hasAdvisory: Boolean) {
+        val trip = Trip(0, country, countryCode, startDate, endDate, hasAdvisory)
 
         MainActivity.database?.tripDao()?.insert(trip)
     }
 
-    private fun pickDate(btn : Button): Int {
+    private fun pickDate(btn: Button) {
         val cal = Calendar.getInstance()
         val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
-//            Log.d("!@#$ TIME", ().toString())
             btn.text = sdf.format(cal.time)
         }
-        DatePickerDialog(this,
-            dateSetListener,
-            // default to today's date
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)).show()
-
-        return cal.get(Calendar.YEAR) + cal.get(Calendar.DATE) + cal.get(Calendar.DAY_OF_MONTH)
-
+        val dpd = DatePickerDialog (this,
+                dateSetListener,
+                // default to today's date
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH))
+        dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
+        dpd.show()
     }
-
 }

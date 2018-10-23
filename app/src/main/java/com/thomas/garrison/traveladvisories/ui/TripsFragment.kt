@@ -1,20 +1,28 @@
 package com.thomas.garrison.traveladvisories.ui
 
+import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.Toast
 import com.thomas.garrison.traveladvisories.R
 import com.thomas.garrison.traveladvisories.TripAdapter
 import com.thomas.garrison.traveladvisories.TripViewModel
 import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.fragment_trips.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -35,8 +43,6 @@ class TripsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-
-
         return inflater.inflate(R.layout.fragment_trips, container, false)
     }
 
@@ -55,7 +61,7 @@ class TripsFragment : Fragment() {
         // Update the list when the data changes
         viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
             if (trips != null) {
-                rv_trips.adapter = TripAdapter(trips)
+                rv_trips.adapter = TripAdapter(trips) { trip: Trip -> openAddTripDialog(trip) }
             } else {
 
             }
@@ -74,6 +80,107 @@ class TripsFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    private fun tripClicked(trip: Trip) {
+
+        Toast.makeText(context, trip.country, Toast.LENGTH_SHORT).show()
+
+
+//        MainActivity.open
+//        val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
+//        advisoryDetailView.putExtra("country", trip.country)
+//        startActivity(advisoryDetailView)
+    }
+
+    private fun openAddTripDialog(trip: Trip) {
+
+        val dialogBuilder = AlertDialog.Builder(context!!)
+
+        val dialogView = layoutInflater.inflate(R.layout.fragment_add_trip, null)
+
+        val countryNamesArray = resources.getStringArray(R.array.country_names)
+        val countryCodesArray = resources.getStringArray(R.array.country_codes)
+        val adapter = ArrayAdapter<String>(context, android.R.layout.select_dialog_item, countryNamesArray)
+        val autoCompleteTextView = dialogView.findViewById<AutoCompleteTextView>(R.id.auto_tv_countries)
+        autoCompleteTextView.threshold = 1
+        autoCompleteTextView.setAdapter(adapter)
+        autoCompleteTextView.setText(trip.country)
+
+        val btnChooseStartDate = dialogView.findViewById<Button>(R.id.btn_start_date)
+        val btnChooseEndDate = dialogView.findViewById<Button>(R.id.btn_end_date)
+
+        btnChooseStartDate.text = trip.startDate
+        btnChooseEndDate.text = trip.endDate
+
+        btnChooseStartDate.setOnClickListener {
+            pickDate(btnChooseStartDate)
+        }
+        btnChooseEndDate.setOnClickListener {
+            pickDate(btnChooseEndDate)
+        }
+
+        dialogBuilder.setView(dialogView)
+
+                .setPositiveButton("Save") { dialog, id ->
+
+                    val chosenCountry = autoCompleteTextView.text.toString()
+                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
+                    val hasAdvisory = MainActivity.countriesWithAdvisories.contains(chosenCountryCode)
+
+                    updateTrip(Trip(trip.tid,
+                            chosenCountry,
+                            chosenCountryCode,
+                            btnChooseStartDate.text.toString(),
+                            btnChooseEndDate.text.toString(),
+                            hasAdvisory))
+
+                    dialog.dismiss()
+                }
+
+                .setNegativeButton("") { dialog, id ->
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                    deleteTrip(trip)
+                }
+                .setNegativeButtonIcon(resources.getDrawable(R.drawable.ic_baseline_delete_24px))
+
+                .setNeutralButton("Cancel") { dialog, id ->
+
+                    dialog.cancel()
+                }
+
+                .setCancelable(false)
+
+        val alert = dialogBuilder.create()
+        alert.setTitle("Edit Trip")
+        alert.show()
+    }
+
+    private fun deleteTrip(trip: Trip) {
+        MainActivity.database?.tripDao()?.delete(trip)
+    }
+
+    private fun updateTrip(trip: Trip) {
+        MainActivity.database?.tripDao()?.update(trip)
+    }
+
+    private fun pickDate(btn: Button) {
+        val cal = Calendar.getInstance()
+        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, monthOfYear)
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
+            btn.text = sdf.format(cal.time)
+        }
+        val dpd = DatePickerDialog(context,
+                dateSetListener,
+                // default to today's date
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH))
+        dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
+        dpd.show()
     }
 
     companion object {

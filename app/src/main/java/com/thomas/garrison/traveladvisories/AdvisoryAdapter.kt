@@ -4,13 +4,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.advisory_card_layout.view.*
+import kotlinx.android.synthetic.main.card_layout_advisory.view.*
 
 class AdvisoryAdapter (private val advisoryItemList: List<Advisory>?, private val clickListener: (Advisory) -> Unit) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.advisory_card_layout, parent, false)
+        val view = inflater.inflate(R.layout.card_layout_advisory, parent, false)
 
         return AdvisoryViewHolder(view)
     }
@@ -24,7 +24,7 @@ class AdvisoryAdapter (private val advisoryItemList: List<Advisory>?, private va
     class AdvisoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(advisory: Advisory, clickListener: (Advisory) -> Unit) {
 
-            itemView.advisory_rv_country.text = advisory.country
+            itemView.advisory_rv_country.text = advisory.countryCode
             itemView.setOnClickListener { clickListener(advisory) }
         }
     }

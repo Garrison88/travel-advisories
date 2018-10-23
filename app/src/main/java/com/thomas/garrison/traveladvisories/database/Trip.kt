@@ -8,6 +8,8 @@ data class Trip(
     @PrimaryKey(autoGenerate = true)
     val tid: Long,
     val country: String = "",
+    val countryCode: String = "",
     val startDate: String = "",
-    val endDate: String = ""
+    val endDate: String = "",
+    val hasAdvisory: Boolean
 )

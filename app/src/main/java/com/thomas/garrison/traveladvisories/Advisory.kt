@@ -1,9 +1,12 @@
 package com.thomas.garrison.traveladvisories
 
-import android.arch.persistence.room.Entity
+import com.google.gson.annotations.SerializedName
 
-@Entity
-data class Advisory (
-        val country: String = "",
-        val countryCode: String = ""
+class Advisory (
+//        @SerializedName("region_name")
+//            val country: String,
+        @SerializedName("iso_2")
+            val countryCode: String
+//        @SerializedName("legal_code_scruff_comments")
+//            val comments: String
 )

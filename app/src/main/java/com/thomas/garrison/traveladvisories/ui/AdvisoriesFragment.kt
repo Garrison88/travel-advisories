@@ -12,17 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.google.gson.GsonBuilder
 import com.thomas.garrison.traveladvisories.Advisory
 import com.thomas.garrison.traveladvisories.AdvisoryAdapter
 import com.thomas.garrison.traveladvisories.R
-import com.thomas.garrison.traveladvisories.api.ScruffService
-import com.thomas.garrison.traveladvisories.api.TravelAdvisory
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,9 +30,13 @@ private const val ARG_PARAM2 = "param2"
  */
 class AdvisoriesFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
+    private val advisories = ArrayList<Advisory>()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+
 
         return inflater.inflate(R.layout.fragment_advisories, container, false)
     }
@@ -56,19 +52,27 @@ class AdvisoriesFragment : Fragment() {
         val recyclerView = view.findViewById(R.id.rv_advisories) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
 
-        val advisories = ArrayList<Advisory>()
+        val advisoryCodes = ArrayList<String>()
+        advisoryCodes.addAll(MainActivity.countriesWithAdvisories)
+//        val advisories = ArrayList<Advisory>()
+        //                    for (advisory in response.body()!!.Africa) {
+//                        Log.d("Africa: ", advisory)
+//                        countriesWithAdvisories.add(advisory)
+//                    }
+        for (code in advisoryCodes) {
+            advisories.add(Advisory(code))
+        }
 
-        advisories.add(Advisory("Canada"))
-        advisories.add(Advisory("Belize"))
-        advisories.add(Advisory("England"))
-        advisories.add(Advisory("France"))
+        Log.d("ADVISORIES", arguments?.get(ADVISORY_CODES).toString())
+//        Log.d("!@#$", MainActivity.countriesWithAdvisories.toString())
+
+//        advisories.add(MainActivity.countriesWithAdvisories[1])
 
         val adapter = AdvisoryAdapter(advisories) { advisory : Advisory -> advisoryClicked(advisory) }
 
+//        MainActivity.countriesWithAdvisories
+
         recyclerView.adapter = adapter
-
-        getAdvisories()
-
 
     }
 
@@ -89,62 +93,23 @@ class AdvisoriesFragment : Fragment() {
     private fun advisoryClicked(advisory : Advisory) {
 
         val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
-        advisoryDetailView.putExtra("country", advisory.country)
+        advisoryDetailView.putExtra("country", advisory.countryCode)
         startActivity(advisoryDetailView)
-    }
-
-    private fun getAdvisories() {
-
-        val gson = GsonBuilder()
-                .setLenient()
-                .create()
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl(ScruffService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-
-        val service = retrofit.create(ScruffService::class.java)
-
-        val advisories = service.advisories
-
-        advisories.enqueue(object : Callback<List<TravelAdvisory>> {
-
-            override fun onResponse(call: Call<List<TravelAdvisory>>?, response: Response<List<TravelAdvisory>>?) {
-
-                if (response != null && response.isSuccessful && response.body() != null) {
-
-                    val advisoryList = response.body()
-
-                    val advisory = arrayOfNulls<String>(advisoryList!!.size)
-
-                    for (i in advisoryList.indices) {
-                        advisory[i] = advisoryList[i].regionName
-                        Log.d("Advisory: ", advisory[i])
-                    }
-                }
-            }
-            override fun onFailure(call: Call<List<TravelAdvisory>>?, t: Throwable?) {
-
-                Log.d("Error ",t?.message)
-
-            }
-
-        })
-
     }
 
     companion object {
 
         // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
+        const val ADVISORY_CODES = "test"
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
+        fun newInstance(columnCount: Int, advisoryCodes: ArrayList<String>) =
                 AdvisoriesFragment().apply {
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
+                        putStringArrayList(ADVISORY_CODES, advisoryCodes)
                     }
                 }
     }
