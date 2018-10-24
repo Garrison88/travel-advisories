@@ -1,6 +1,7 @@
 package com.thomas.garrison.traveladvisories.ui
 
 import android.app.DatePickerDialog
+import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -12,13 +13,16 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.animation.CycleInterpolator
+import android.view.animation.TranslateAnimation
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.Toast
 import com.google.gson.GsonBuilder
 import com.thomas.garrison.traveladvisories.R
-import com.thomas.garrison.traveladvisories.api.ScruffService
 import com.thomas.garrison.traveladvisories.api.CountriesWithAdvisories
+import com.thomas.garrison.traveladvisories.api.ScruffService
 import com.thomas.garrison.traveladvisories.database.AppDatabase
 import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.activity_main.*
@@ -103,7 +107,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                     countriesWithAdvisories.addAll(response.body()!!.oceania)
                     countriesWithAdvisories.addAll(response.body()!!.europe)
 
-                    Log.d("STUFF", countriesWithAdvisories.toString())
+//                    Log.d("STUFF", countriesWithAdvisories.toString())
                 }
             }
 
@@ -144,7 +148,9 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                     TripsFragment.newInstance(position + 1)
                 }
                 1 -> {
-                    AdvisoriesFragment.newInstance(position + 1, countriesWithAdvisories)
+                    AdvisoriesFragment.newInstance(position + 1
+//                           , countriesWithAdvisories
+                    )
                 }
                 else -> {
                     null
@@ -186,19 +192,8 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
                 .setPositiveButton("Save") { dialog, id ->
 
-                    val chosenCountry = autoCompleteTextView.text.toString()
-                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
-                    val hasAdvisory = countriesWithAdvisories.contains(chosenCountryCode)
-
-                    addTrip(chosenCountry,
-                            chosenCountryCode,
-                            btnChooseStartDate.text.toString(),
-                            btnChooseEndDate.text.toString(),
-                            hasAdvisory)
-                    dialog.dismiss()
                 }
-
-                .setNeutralButton("Cancel") { dialog, id ->
+                .setNegativeButton("Cancel") { dialog, id ->
                     dialog.cancel()
                 }
 
@@ -207,11 +202,34 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         val alert = dialogBuilder.create()
         alert.setTitle("Add Trip")
         alert.show()
+
+        alert.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+
+            val chosenCountry = autoCompleteTextView.text.toString()
+
+            if (!countryNamesArray.contains(chosenCountry)) {
+                autoCompleteTextView.startAnimation(shakeError())
+                autoCompleteTextView.error = "Invalid country"
+            } else if (btnChooseStartDate.text == getString(R.string.depart_btn_txt)) {
+                btnChooseStartDate.startAnimation(shakeError())
+                Toast.makeText(applicationContext, "Please choose a start date", Toast.LENGTH_SHORT).show()
+            } else if (btnChooseEndDate.text == (getString(R.string.return_btn_txt))) {
+                btnChooseEndDate.startAnimation(shakeError())
+                Toast.makeText(applicationContext, "Please choose an end date", Toast.LENGTH_SHORT).show()
+            } else {
+                val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
+                val hasAdvisory = countriesWithAdvisories.contains(chosenCountryCode)
+                addTrip(Trip(0, chosenCountry,
+                        chosenCountryCode,
+                        btnChooseStartDate.text.toString(),
+                        btnChooseEndDate.text.toString(),
+                        hasAdvisory))
+                alert.dismiss()
+            }
+        }
     }
 
-    private fun addTrip(country: String, countryCode: String, startDate: String, endDate: String, hasAdvisory: Boolean) {
-        val trip = Trip(0, country, countryCode, startDate, endDate, hasAdvisory)
-
+    private fun addTrip(trip: Trip) {
         MainActivity.database?.tripDao()?.insert(trip)
     }
 
@@ -224,7 +242,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
             val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
             btn.text = sdf.format(cal.time)
         }
-        val dpd = DatePickerDialog (this,
+        val dpd = DatePickerDialog(this,
                 dateSetListener,
                 // default to today's date
                 cal.get(Calendar.YEAR),
@@ -232,5 +250,12 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                 cal.get(Calendar.DAY_OF_MONTH))
         dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
         dpd.show()
+    }
+
+    private fun shakeError(): TranslateAnimation {
+        val shake = TranslateAnimation(0f, 10f, 0f, 0f)
+        shake.duration = 400
+        shake.interpolator = CycleInterpolator(4f)
+        return shake
     }
 }

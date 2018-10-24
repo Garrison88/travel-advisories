@@ -1,12 +1,10 @@
 package com.thomas.garrison.traveladvisories
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.thomas.garrison.traveladvisories.database.Trip
-import com.thomas.garrison.traveladvisories.ui.MainActivity
 import kotlinx.android.synthetic.main.card_layout_trip.view.*
 
 class TripAdapter (private val tripItemList: List<Trip>?, private val clickListener: (Trip) -> Unit) :
@@ -28,8 +26,8 @@ class TripAdapter (private val tripItemList: List<Trip>?, private val clickListe
         fun bind(trip: Trip, clickListener: (Trip) -> Unit) {
 
             itemView.rv_tv_country.text = trip.country
-            itemView.rv_tv_start_date.text = "Starts on ${trip.startDate}"
-            itemView.rv_tv_end_date.text = "Ends on ${trip.endDate}"
+            itemView.rv_tv_start_date.text = "Starts on${trip.startDate}"
+            itemView.rv_tv_end_date.text = "Ends on${trip.endDate}"
             itemView.rv_warning.visibility = if (trip.hasAdvisory) View.VISIBLE else View.INVISIBLE
             itemView.setOnClickListener { clickListener(trip) }
         }

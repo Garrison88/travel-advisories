@@ -24,7 +24,8 @@ class AdvisoryAdapter (private val advisoryItemList: List<Advisory>?, private va
     class AdvisoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(advisory: Advisory, clickListener: (Advisory) -> Unit) {
 
-            itemView.advisory_rv_country.text = advisory.countryCode
+
+            itemView.advisory_rv_country.text = advisory.country
             itemView.setOnClickListener { clickListener(advisory) }
         }
     }

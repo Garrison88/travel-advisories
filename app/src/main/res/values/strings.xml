@@ -2,6 +2,19 @@
     <string name="app_name">Travel Advisories</string>
     <string name="title_trips">Trips</string>
     <string name="title_advisories">Advisories</string>
+    <string name="title_activity_add_trip">AddTripActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="tab_trips">My Trips</string>
+    <string name="tab_advisories">Advisories</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_advisory_detail_view_fragment">AdvisoryDetailViewFragment</string>
+    <string name="lorem_ipsum">Mollitia ea sapiente eaque possimus. Aut provident et est placeat.
+        Et accusantium maiores qui non qui ut quidem assumenda. Autem enim maiores minima autem mollitia nesciunt dolor.
+        Doloribus ea laudantium temporibus eveniet non itaque. Ab voluptates ab quo explicabo.</string>
+    <string name="depart_btn_txt">&#160;Depart</string>
+    <string name="return_btn_txt">&#160;Return</string>
+    <string name="autocompletetextview_hint">Where to?</string>
 
     <string-array name="country_names">
         <item>Afghanistan</item>
@@ -482,16 +495,5 @@
         <item>zm</item>
         <item>zw</item>
     </string-array>
-
-    <string name="title_activity_add_trip">AddTripActivity</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="tab_trips">My Trips</string>
-    <string name="tab_advisories">Advisories</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
-    <string name="title_activity_advisory_detail_view_fragment">AdvisoryDetailViewFragment</string>
-    <string name="lorem_ipsum">Mollitia ea sapiente eaque possimus. Aut provident et est placeat.
-        Et accusantium maiores qui non qui ut quidem assumenda. Autem enim maiores minima autem mollitia nesciunt dolor.
-        Doloribus ea laudantium temporibus eveniet non itaque. Ab voluptates ab quo explicabo.</string>
 
 </resources>

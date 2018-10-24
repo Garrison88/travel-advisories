@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -12,6 +13,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.CycleInterpolator
+import android.view.animation.TranslateAnimation
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -124,36 +127,64 @@ class TripsFragment : Fragment() {
 
                 .setPositiveButton("Save") { dialog, id ->
 
-                    val chosenCountry = autoCompleteTextView.text.toString()
-                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
-                    val hasAdvisory = MainActivity.countriesWithAdvisories.contains(chosenCountryCode)
-
-                    updateTrip(Trip(trip.tid,
-                            chosenCountry,
-                            chosenCountryCode,
-                            btnChooseStartDate.text.toString(),
-                            btnChooseEndDate.text.toString(),
-                            hasAdvisory))
-
-                    dialog.dismiss()
                 }
 
-                .setNegativeButton("") { dialog, id ->
-                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                    deleteTrip(trip)
-                }
-                .setNegativeButtonIcon(resources.getDrawable(R.drawable.ic_baseline_delete_24px))
-
-                .setNeutralButton("Cancel") { dialog, id ->
-
+                .setNegativeButton("Cancel") { dialog, id ->
                     dialog.cancel()
                 }
 
+                .setNeutralButton(" ") { dialog, id -> }
                 .setCancelable(false)
 
         val alert = dialogBuilder.create()
         alert.setTitle("Edit Trip")
         alert.show()
+
+        alert.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+
+            val chosenCountry = autoCompleteTextView.text.toString()
+
+            if (!countryNamesArray.contains(chosenCountry)) {
+                autoCompleteTextView.startAnimation(shakeError())
+                autoCompleteTextView.error = "Invalid country"
+            } else {
+                val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
+                val hasAdvisory = MainActivity.countriesWithAdvisories.contains(chosenCountryCode)
+
+                updateTrip(Trip(trip.tid,
+                        chosenCountry,
+                        chosenCountryCode,
+                        btnChooseStartDate.text.toString(),
+                        btnChooseEndDate.text.toString(),
+                        hasAdvisory))
+
+                alert.dismiss()
+            }
+        }
+
+        val negBtn = alert.getButton(DialogInterface.BUTTON_NEUTRAL)
+        negBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_delete_24px, 0, 0, 0)
+        negBtn.setOnClickListener {
+            val dialogClickListener = DialogInterface.OnClickListener { dialog, which ->
+                when (which) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                        deleteTrip(trip)
+                        alert.cancel()
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        dialog.cancel()
+                    }
+                }
+            }
+            val builder = AlertDialog.Builder(context!!)
+            builder
+                    .setTitle("Delete")
+                    .setMessage("Really delete?")
+                    .setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener)
+                    .show()
+        }
     }
 
     private fun deleteTrip(trip: Trip) {
@@ -170,7 +201,7 @@ class TripsFragment : Fragment() {
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
+            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             btn.text = sdf.format(cal.time)
         }
         val dpd = DatePickerDialog(context,
@@ -181,6 +212,13 @@ class TripsFragment : Fragment() {
                 cal.get(Calendar.DAY_OF_MONTH))
         dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
         dpd.show()
+    }
+
+    private fun shakeError(): TranslateAnimation {
+        val shake = TranslateAnimation(0f, 10f, 0f, 0f)
+        shake.duration = 400
+        shake.interpolator = CycleInterpolator(4f)
+        return shake
     }
 
     companion object {

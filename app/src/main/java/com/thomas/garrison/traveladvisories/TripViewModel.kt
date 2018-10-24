@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel
 import com.thomas.garrison.traveladvisories.database.Trip
 import com.thomas.garrison.traveladvisories.ui.MainActivity.Companion.database
 
-
 class TripViewModel : ViewModel() {
     private var trips: LiveData<List<Trip>>? = null
     fun getTrips(): LiveData<List<Trip>> {
