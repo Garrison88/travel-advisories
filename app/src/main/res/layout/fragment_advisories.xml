@@ -5,6 +5,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.AdvisoriesFragment">
 
+    <Button
+        android:id="@+id/refresh_btn"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:drawableStart="@drawable/ic_baseline_refresh_24px"
+        android:text="Refresh"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_advisories"
         android:layout_width="match_parent"

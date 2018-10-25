@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import com.google.gson.GsonBuilder
 import com.thomas.garrison.traveladvisories.Advisory
@@ -38,8 +39,9 @@ private const val ARG_PARAM2 = "param2"
  */
 class AdvisoriesFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
-    private var CWA = ArrayList<String>()
-    private lateinit var adapter : AdvisoryAdapter
+    //    private var CWA = ArrayList<String>()
+//    private lateinit var
+    lateinit var refreshBtn: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -56,40 +58,10 @@ class AdvisoriesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         getAdvisories()
-
-        val advisories = ArrayList<Advisory>()
-
-        val advisoryCodes = ArrayList<String>()
-        advisoryCodes.addAll(CWA)
-//        val advisories = ArrayList<Advisory>()
-        //                    for (advisory in response.body()!!.Africa) {
-//                        Log.d("Africa: ", advisory)
-//                        countriesWithAdvisories.add(advisory)
-//                    }
-        for (code in advisoryCodes) {
-            advisories.add(Advisory(code, code, code))
+        refreshBtn = view.findViewById(R.id.refresh_btn)
+        refreshBtn.setOnClickListener {
+            getAdvisories()
         }
-
-
-
-        val recyclerView = view.findViewById(R.id.rv_advisories) as RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
-
-
-
-
-        Log.d("ADVISORIES", arguments?.get(ADVISORY_CODES).toString())
-
-//        Log.d("!@#$", MainActivity.countriesWithAdvisories.toString())
-
-//        advisories.add(MainActivity.countriesWithAdvisories[1])
-
-        adapter = AdvisoryAdapter(advisories) { advisory : Advisory -> advisoryClicked(advisory) }
-
-//        MainActivity.countriesWithAdvisories
-
-        recyclerView.adapter = adapter
-
     }
 
     override fun onAttach(context: Context) {
@@ -106,9 +78,10 @@ class AdvisoriesFragment : Fragment() {
         listener = null
     }
 
-    private fun advisoryClicked(advisory : Advisory) {
+    private fun advisoryClicked(advisory: Advisory) {
 
         val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
+        advisoryDetailView.putExtra("country_name", advisory.country)
         advisoryDetailView.putExtra("country_code", advisory.countryCode)
         startActivity(advisoryDetailView)
     }
@@ -126,19 +99,35 @@ class AdvisoriesFragment : Fragment() {
 
         val service = retrofit.create(ScruffService::class.java)
 
-        val advisories = service.advisories
+        val advisories = service.advisories()
 
         advisories.enqueue(object : Callback<CountriesWithAdvisories> {
 
             override fun onResponse(call: Call<CountriesWithAdvisories>?, response: Response<CountriesWithAdvisories>?) {
 
                 if (response != null && response.isSuccessful && response.body() != null) {
+
+//                    var adapter : AdvisoryAdapter
 //
 //                    for (advisory in response.body()!!.Africa) {
 //                        Log.d("Africa: ", advisory)
 //                        countriesWithAdvisories.add(advisory)
-//                    }
+
+                    val recyclerView = view?.findViewById(R.id.rv_advisories) as RecyclerView
+                    recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+
+//                    Log.d("ADVISORIES", arguments?.get(ADVISORY_CODES).toString())
+
                     val countriesWithAdvisories = ArrayList<String>()
+                    val foundAdvisories = ArrayList<Advisory>()
+                    val countryNamesArray = resources.getStringArray(R.array.country_names)
+                    val countryCodesArray = resources.getStringArray(R.array.country_codes)
+//                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
+
+//                    countriesWithAdvisories.add(Advisory("Here", "cc", "Message"))
+//                    countriesWithAdvisories.add(Advisory("More", "gg", "Message"))
+//                    countriesWithAdvisories.add(Advisory("When", "jj", "Message"))
+//                    countriesWithAdvisories.add(Advisory("All", "ww", "Message"))
 
                     countriesWithAdvisories.addAll(response.body()!!.africa)
                     countriesWithAdvisories.addAll(response.body()!!.asia)
@@ -146,8 +135,22 @@ class AdvisoriesFragment : Fragment() {
                     countriesWithAdvisories.addAll(response.body()!!.oceania)
                     countriesWithAdvisories.addAll(response.body()!!.europe)
 
-                    CWA.addAll(countriesWithAdvisories)
+//                    Log.d("!@#$", countriesWithAdvisories.toString())
+
+                    for (code in countriesWithAdvisories) {
+                        if (countryCodesArray.contains(code)) {
+                            foundAdvisories.add(Advisory(countryNamesArray[countryCodesArray.indexOf(code)], code, ""))
+                            Log.d("!@#$", countryNamesArray[countryCodesArray.indexOf(code)])
+                        }
+                    }
+
+                    val adapter = AdvisoryAdapter(foundAdvisories) { advisory: Advisory -> advisoryClicked(advisory) }
+
+                    recyclerView.adapter = adapter
+
                     adapter.notifyDataSetChanged()
+
+                    refreshBtn.visibility = View.GONE
 
 //                    Log.d("STUFF", MainActivity.countriesWithAdvisories.toString())
                 }

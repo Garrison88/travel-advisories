@@ -7,6 +7,6 @@ class Advisory (
             val country: String,
         @SerializedName("iso_2")
             val countryCode: String,
-        @SerializedName("legal_code_scruff_comments")
+        @SerializedName("legal_code_body")
             val comments: String
 )

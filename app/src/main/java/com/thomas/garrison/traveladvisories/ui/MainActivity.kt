@@ -68,7 +68,9 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
         tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
-        fab.setOnClickListener { openAddTripDialog() }
+        fab.setOnClickListener {
+            openAddTripDialog()
+        }
 
         getAdvisories()
 
@@ -87,19 +89,13 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
         val service = retrofit.create(ScruffService::class.java)
 
-        val advisories = service.advisories
+        val advisories = service.advisories()
 
         advisories.enqueue(object : Callback<CountriesWithAdvisories> {
 
             override fun onResponse(call: Call<CountriesWithAdvisories>?, response: Response<CountriesWithAdvisories>?) {
 
                 if (response != null && response.isSuccessful && response.body() != null) {
-//
-//                    for (advisory in response.body()!!.Africa) {
-//                        Log.d("Africa: ", advisory)
-//                        countriesWithAdvisories.add(advisory)
-//                    }
-//                    val countriesWithAdvisories = ArrayList<String>()
 
                     countriesWithAdvisories.addAll(response.body()!!.africa)
                     countriesWithAdvisories.addAll(response.body()!!.asia)
@@ -107,7 +103,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                     countriesWithAdvisories.addAll(response.body()!!.oceania)
                     countriesWithAdvisories.addAll(response.body()!!.europe)
 
-//                    Log.d("STUFF", countriesWithAdvisories.toString())
                 }
             }
 
@@ -212,10 +207,10 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                 autoCompleteTextView.error = "Invalid country"
             } else if (btnChooseStartDate.text == getString(R.string.depart_btn_txt)) {
                 btnChooseStartDate.startAnimation(shakeError())
-                Toast.makeText(applicationContext, "Please choose a start date", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Please choose a departure date", Toast.LENGTH_SHORT).show()
             } else if (btnChooseEndDate.text == (getString(R.string.return_btn_txt))) {
                 btnChooseEndDate.startAnimation(shakeError())
-                Toast.makeText(applicationContext, "Please choose an end date", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Please choose a return date", Toast.LENGTH_SHORT).show()
             } else {
                 val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
                 val hasAdvisory = countriesWithAdvisories.contains(chosenCountryCode)

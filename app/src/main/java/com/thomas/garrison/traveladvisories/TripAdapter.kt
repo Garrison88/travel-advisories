@@ -7,8 +7,9 @@ import android.view.ViewGroup
 import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.card_layout_trip.view.*
 
-class TripAdapter (private val tripItemList: List<Trip>?, private val clickListener: (Trip) -> Unit) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TripAdapter (private val tripItemList: List<Trip>?,
+//                   private val clickListener: View.OnClickListener,
+                   private val tripClickListener: (Trip) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.card_layout_trip, parent, false)
@@ -19,17 +20,20 @@ class TripAdapter (private val tripItemList: List<Trip>?, private val clickListe
     override fun getItemCount() = tripItemList!!.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as TripViewHolder).bind(tripItemList!![position], clickListener)
+        (holder as TripViewHolder).bind(tripItemList!![position], tripClickListener)
     }
 
     class TripViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(trip: Trip, clickListener: (Trip) -> Unit) {
+        fun bind(trip: Trip, tripClickListener: (Trip) -> Unit) {
 
             itemView.rv_tv_country.text = trip.country
             itemView.rv_tv_start_date.text = "Starts on${trip.startDate}"
             itemView.rv_tv_end_date.text = "Ends on${trip.endDate}"
             itemView.rv_warning.visibility = if (trip.hasAdvisory) View.VISIBLE else View.INVISIBLE
-            itemView.setOnClickListener { clickListener(trip) }
+
+//            itemView.rv_warning.setOnClickListener { clickListener }
+
+            itemView.setOnClickListener { tripClickListener(trip) }
         }
     }
 }

@@ -64,7 +64,7 @@ class TripsFragment : Fragment() {
         // Update the list when the data changes
         viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
             if (trips != null) {
-                rv_trips.adapter = TripAdapter(trips) { trip: Trip -> openAddTripDialog(trip) }
+                rv_trips.adapter = TripAdapter(trips) { trip: Trip -> openEditTripDialog(trip) }
             } else {
 
             }
@@ -96,7 +96,7 @@ class TripsFragment : Fragment() {
 //        startActivity(advisoryDetailView)
     }
 
-    private fun openAddTripDialog(trip: Trip) {
+    private fun openEditTripDialog(trip: Trip) {
 
         val dialogBuilder = AlertDialog.Builder(context!!)
 
@@ -201,7 +201,7 @@ class TripsFragment : Fragment() {
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
             btn.text = sdf.format(cal.time)
         }
         val dpd = DatePickerDialog(context,
