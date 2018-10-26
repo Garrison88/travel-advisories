@@ -1,4 +1,4 @@
-package com.thomas.garrison.traveladvisories
+package com.thomas.garrison.traveladvisories.api
 
 import com.google.gson.annotations.SerializedName
 

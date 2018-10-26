@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -41,7 +40,6 @@ private const val ARG_PARAM2 = "param2"
  */
 class TripFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
-//    private lateinit var advisoryClickListener: View.OnClickListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -69,7 +67,7 @@ class TripFragment : Fragment() {
         // Update the list when the data changes
         viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
             if (trips != null) {
-                rv_trips.adapter = TripAdapter(trips) { trip: Trip -> openEditTripDialog(trip) }
+                rv_trips.adapter = TripAdapter(context!!, trips) { trip: Trip -> openEditTripDialog(trip) }
             }
         })
     }
@@ -86,15 +84,6 @@ class TripFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
-    }
-
-    private fun tripClicked(trip: Trip) {
-
-        Toast.makeText(context, trip.country, Toast.LENGTH_SHORT).show()
-
-        val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
-        advisoryDetailView.putExtra("country", trip.country)
-        startActivity(advisoryDetailView)
     }
 
     private fun openEditTripDialog(trip: Trip) {

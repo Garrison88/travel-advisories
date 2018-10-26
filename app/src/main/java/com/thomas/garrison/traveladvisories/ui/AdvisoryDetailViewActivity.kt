@@ -10,21 +10,15 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
-import com.thomas.garrison.traveladvisories.Advisory
 import com.thomas.garrison.traveladvisories.R
+import com.thomas.garrison.traveladvisories.api.Advisory
 import com.thomas.garrison.traveladvisories.api.ScruffService
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
-import java.net.InetSocketAddress
-import java.net.Socket
 
 
 class AdvisoryDetailViewActivity : AppCompatActivity() {
@@ -37,23 +31,13 @@ class AdvisoryDetailViewActivity : AppCompatActivity() {
         val countryCode = intent.getStringExtra("country_code")
 
 
-        hasInternetConnection().subscribe { hasInternet ->
-            getAdvisory(countryCode)
-        }
-
+//        Utils.hasInternetConnection().subscribe { hasInternet ->
+//        }
+        getAdvisory(countryCode)
 
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24px)
 
         toolbar.setNavigationOnClickListener { finish() }
-
-//        flagImage.setImageDrawable(resources.getDrawable(R.drawable.flag_af))
-
-//        Picasso.with(applicationContext)
-//                .load("https://www.countryflags.io/$country/flat/64.png")
-//                .placeholder(R.drawable.ic_baseline_flag_24px)
-//                .resize(500, 500)
-//                .centerCrop()
-//                .into(flagImage)
     }
 
     private fun getAdvisory(countryCode: String) {
@@ -74,7 +58,7 @@ class AdvisoryDetailViewActivity : AppCompatActivity() {
 
         val service = retrofit.create(ScruffService::class.java)
 
-        val advisory = service.advisoryByCode(countryCode)
+        val advisory = service.getAdvisoryByCountryCode(countryCode)
 
         advisory.enqueue(object : Callback<Advisory> {
 
@@ -104,29 +88,10 @@ class AdvisoryDetailViewActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<Advisory>?, t: Throwable?) {
 
+                pBar.visibility = View.GONE
                 Log.d("Error ", t?.message)
 
             }
         })
-    }
-
-    fun hasInternetConnection(): Single<Boolean> {
-        return Single.fromCallable {
-            try {
-                // Connect to Google DNS to check for connection
-                val timeoutMs = 1500
-                val socket = Socket()
-                val socketAddress = InetSocketAddress("8.8.8.8", 53)
-
-                socket.connect(socketAddress, timeoutMs)
-                socket.close()
-
-                true
-            } catch (e: IOException) {
-                false
-            }
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 }

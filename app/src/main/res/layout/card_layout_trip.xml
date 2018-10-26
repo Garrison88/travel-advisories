@@ -10,8 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -44,16 +44,16 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
             <ImageView
-                android:adjustViewBounds="true"
-                android:layout_gravity="center"
                 android:id="@+id/rv_warning"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
                 android:src="@drawable/ic_warning_dark_24px"
                 android:visibility="invisible" />
 

@@ -2,6 +2,7 @@ package com.thomas.garrison.traveladvisories
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
+import com.thomas.garrison.traveladvisories.api.Advisory
 
 class AdvisoryViewModel : ViewModel() {
     private var advisories: LiveData<List<Advisory>>? = null

@@ -14,9 +14,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import com.google.gson.GsonBuilder
-import com.thomas.garrison.traveladvisories.Advisory
 import com.thomas.garrison.traveladvisories.AdvisoryAdapter
 import com.thomas.garrison.traveladvisories.R
+import com.thomas.garrison.traveladvisories.api.Advisory
 import com.thomas.garrison.traveladvisories.api.CountriesWithAdvisories
 import com.thomas.garrison.traveladvisories.api.ScruffService
 import retrofit2.Call
@@ -96,7 +96,7 @@ class AdvisoriesFragment : Fragment() {
 
         val service = retrofit.create(ScruffService::class.java)
 
-        val advisories = service.advisories()
+        val advisories = service.getAllAdvisories()
 
         advisories.enqueue(object : Callback<CountriesWithAdvisories> {
 

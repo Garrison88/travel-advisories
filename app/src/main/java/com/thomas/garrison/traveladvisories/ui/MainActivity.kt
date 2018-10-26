@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
         val service = retrofit.create(ScruffService::class.java)
 
-        val advisories = service.advisories()
+        val advisories = service.getAllAdvisories()
 
         advisories.enqueue(object : Callback<CountriesWithAdvisories> {
 
@@ -143,9 +143,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
                     TripFragment.newInstance(position + 1)
                 }
                 1 -> {
-                    AdvisoriesFragment.newInstance(position + 1
-//                           , countriesWithAdvisories
-                    )
+                    AdvisoriesFragment.newInstance(position + 1)
                 }
                 else -> {
                     null
@@ -158,7 +156,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
             return 2
         }
     }
-
 
     private fun openAddTripDialog() {
 

@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.thomas.garrison.traveladvisories.api.Advisory
 import kotlinx.android.synthetic.main.card_layout_advisory.view.*
 
 class AdvisoryAdapter (private val advisoryItemList: List<Advisory>?, private val clickListener: (Advisory) -> Unit) :
