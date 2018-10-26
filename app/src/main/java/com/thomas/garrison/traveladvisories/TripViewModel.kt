@@ -9,7 +9,6 @@ class TripViewModel : ViewModel() {
     private var trips: LiveData<List<Trip>>? = null
     fun getTrips(): LiveData<List<Trip>> {
         if (trips == null) {
-//            trips = LiveData()
             loadTrips()
         }
         return trips as LiveData<List<Trip>>

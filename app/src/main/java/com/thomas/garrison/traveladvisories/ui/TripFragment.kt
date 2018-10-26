@@ -1,10 +1,10 @@
 package com.thomas.garrison.traveladvisories.ui
 
-import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,8 +13,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.CycleInterpolator
-import android.view.animation.TranslateAnimation
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -22,10 +20,11 @@ import android.widget.Toast
 import com.thomas.garrison.traveladvisories.R
 import com.thomas.garrison.traveladvisories.TripAdapter
 import com.thomas.garrison.traveladvisories.TripViewModel
+import com.thomas.garrison.traveladvisories.Utils.pickDate
+import com.thomas.garrison.traveladvisories.Utils.shakeError
+import com.thomas.garrison.traveladvisories.database.AppDatabase
 import com.thomas.garrison.traveladvisories.database.Trip
 import kotlinx.android.synthetic.main.fragment_trips.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -36,12 +35,13 @@ private const val ARG_PARAM2 = "param2"
 /**
  * A simple [Fragment] subclass.
  * Activities that contain this fragment must implement the
- * [TripsFragment.OnFragmentInteractionListener] interface
+ * [TripFragment.OnFragmentInteractionListener] interface
  * to handle interaction events.
  *
  */
-class TripsFragment : Fragment() {
+class TripFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
+//    private lateinit var advisoryClickListener: View.OnClickListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -60,13 +60,16 @@ class TripsFragment : Fragment() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        AppDatabase.destroyInstance()
+    }
+
     private fun subscribeUi(viewModel: TripViewModel) {
         // Update the list when the data changes
         viewModel.getTrips().observe(this, Observer<List<Trip>> { trips ->
             if (trips != null) {
                 rv_trips.adapter = TripAdapter(trips) { trip: Trip -> openEditTripDialog(trip) }
-            } else {
-
             }
         })
     }
@@ -89,11 +92,9 @@ class TripsFragment : Fragment() {
 
         Toast.makeText(context, trip.country, Toast.LENGTH_SHORT).show()
 
-
-//        MainActivity.open
-//        val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
-//        advisoryDetailView.putExtra("country", trip.country)
-//        startActivity(advisoryDetailView)
+        val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
+        advisoryDetailView.putExtra("country", trip.country)
+        startActivity(advisoryDetailView)
     }
 
     private fun openEditTripDialog(trip: Trip) {
@@ -104,7 +105,7 @@ class TripsFragment : Fragment() {
 
         val countryNamesArray = resources.getStringArray(R.array.country_names)
         val countryCodesArray = resources.getStringArray(R.array.country_codes)
-        val adapter = ArrayAdapter<String>(context, android.R.layout.select_dialog_item, countryNamesArray)
+        val adapter = ArrayAdapter(context, android.R.layout.select_dialog_item, countryNamesArray)
         val autoCompleteTextView = dialogView.findViewById<AutoCompleteTextView>(R.id.auto_tv_countries)
         autoCompleteTextView.threshold = 1
         autoCompleteTextView.setAdapter(adapter)
@@ -117,10 +118,10 @@ class TripsFragment : Fragment() {
         btnChooseEndDate.text = trip.endDate
 
         btnChooseStartDate.setOnClickListener {
-            pickDate(btnChooseStartDate)
+            pickDate(context!!, btnChooseStartDate)
         }
         btnChooseEndDate.setOnClickListener {
-            pickDate(btnChooseEndDate)
+            pickDate(context!!, btnChooseEndDate)
         }
 
         dialogBuilder.setView(dialogView)
@@ -188,37 +189,11 @@ class TripsFragment : Fragment() {
     }
 
     private fun deleteTrip(trip: Trip) {
-        MainActivity.database?.tripDao()?.delete(trip)
+        MainActivity.database?.tripDao()?.deleteTrip(trip)
     }
 
     private fun updateTrip(trip: Trip) {
-        MainActivity.database?.tripDao()?.update(trip)
-    }
-
-    private fun pickDate(btn: Button) {
-        val cal = Calendar.getInstance()
-        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            cal.set(Calendar.YEAR, year)
-            cal.set(Calendar.MONTH, monthOfYear)
-            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
-            btn.text = sdf.format(cal.time)
-        }
-        val dpd = DatePickerDialog(context,
-                dateSetListener,
-                // default to today's date
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH))
-        dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
-        dpd.show()
-    }
-
-    private fun shakeError(): TranslateAnimation {
-        val shake = TranslateAnimation(0f, 10f, 0f, 0f)
-        shake.duration = 400
-        shake.interpolator = CycleInterpolator(4f)
-        return shake
+        MainActivity.database?.tripDao()?.updateTrip(trip)
     }
 
     companion object {
@@ -229,7 +204,7 @@ class TripsFragment : Fragment() {
         // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
-                TripsFragment().apply {
+                TripFragment().apply {
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
                     }

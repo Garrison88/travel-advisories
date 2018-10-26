@@ -39,8 +39,6 @@ private const val ARG_PARAM2 = "param2"
  */
 class AdvisoriesFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
-    //    private var CWA = ArrayList<String>()
-//    private lateinit var
     lateinit var refreshBtn: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +47,7 @@ class AdvisoriesFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_advisories, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    // TODO: Rename method, updateTrip argument and hook method into UI event
     fun onButtonPressed(uri: Uri) {
         listener?.onFragmentInteraction(uri)
     }
@@ -81,7 +79,6 @@ class AdvisoriesFragment : Fragment() {
     private fun advisoryClicked(advisory: Advisory) {
 
         val advisoryDetailView = Intent(context, AdvisoryDetailViewActivity::class.java)
-        advisoryDetailView.putExtra("country_name", advisory.country)
         advisoryDetailView.putExtra("country_code", advisory.countryCode)
         startActivity(advisoryDetailView)
     }
@@ -107,35 +104,19 @@ class AdvisoriesFragment : Fragment() {
 
                 if (response != null && response.isSuccessful && response.body() != null) {
 
-//                    var adapter : AdvisoryAdapter
-//
-//                    for (advisory in response.body()!!.Africa) {
-//                        Log.d("Africa: ", advisory)
-//                        countriesWithAdvisories.add(advisory)
-
                     val recyclerView = view?.findViewById(R.id.rv_advisories) as RecyclerView
                     recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
-
-//                    Log.d("ADVISORIES", arguments?.get(ADVISORY_CODES).toString())
 
                     val countriesWithAdvisories = ArrayList<String>()
                     val foundAdvisories = ArrayList<Advisory>()
                     val countryNamesArray = resources.getStringArray(R.array.country_names)
                     val countryCodesArray = resources.getStringArray(R.array.country_codes)
-//                    val chosenCountryCode = countryCodesArray[countryNamesArray.indexOf(chosenCountry)]
-
-//                    countriesWithAdvisories.add(Advisory("Here", "cc", "Message"))
-//                    countriesWithAdvisories.add(Advisory("More", "gg", "Message"))
-//                    countriesWithAdvisories.add(Advisory("When", "jj", "Message"))
-//                    countriesWithAdvisories.add(Advisory("All", "ww", "Message"))
 
                     countriesWithAdvisories.addAll(response.body()!!.africa)
                     countriesWithAdvisories.addAll(response.body()!!.asia)
                     countriesWithAdvisories.addAll(response.body()!!.latinAmericaAndCaribbean)
                     countriesWithAdvisories.addAll(response.body()!!.oceania)
                     countriesWithAdvisories.addAll(response.body()!!.europe)
-
-//                    Log.d("!@#$", countriesWithAdvisories.toString())
 
                     for (code in countriesWithAdvisories) {
                         if (countryCodesArray.contains(code)) {
@@ -151,8 +132,6 @@ class AdvisoriesFragment : Fragment() {
                     adapter.notifyDataSetChanged()
 
                     refreshBtn.visibility = View.GONE
-
-//                    Log.d("STUFF", MainActivity.countriesWithAdvisories.toString())
                 }
             }
 

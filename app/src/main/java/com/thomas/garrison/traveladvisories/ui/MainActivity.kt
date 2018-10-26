@@ -1,6 +1,5 @@
 package com.thomas.garrison.traveladvisories.ui
 
-import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
@@ -13,14 +12,14 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.animation.CycleInterpolator
-import android.view.animation.TranslateAnimation
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
 import com.google.gson.GsonBuilder
 import com.thomas.garrison.traveladvisories.R
+import com.thomas.garrison.traveladvisories.Utils
+import com.thomas.garrison.traveladvisories.Utils.shakeError
 import com.thomas.garrison.traveladvisories.api.CountriesWithAdvisories
 import com.thomas.garrison.traveladvisories.api.ScruffService
 import com.thomas.garrison.traveladvisories.database.AppDatabase
@@ -31,11 +30,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.*
 
-
-class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteractionListener, TripsFragment.OnFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteractionListener, TripFragment.OnFragmentInteractionListener {
     override fun onFragmentInteraction(uri: Uri) {
 
     }
@@ -76,6 +72,11 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        AppDatabase.destroyInstance()
+    }
+
     private fun getAdvisories() {
 
         val gson = GsonBuilder()
@@ -114,7 +115,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         })
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         override fun getItem(position: Int): Fragment? {
             return when (position) {
                 0 -> {
-                    TripsFragment.newInstance(position + 1)
+                    TripFragment.newInstance(position + 1)
                 }
                 1 -> {
                     AdvisoriesFragment.newInstance(position + 1
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
 
         val countryNamesArray = resources.getStringArray(R.array.country_names)
         val countryCodesArray = resources.getStringArray(R.array.country_codes)
-        val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, countryNamesArray)
+        val adapter = ArrayAdapter(this, android.R.layout.select_dialog_item, countryNamesArray)
         val autoCompleteTextView = dialogView.findViewById<AutoCompleteTextView>(R.id.auto_tv_countries)
         autoCompleteTextView.threshold = 1
         autoCompleteTextView.setAdapter(adapter)
@@ -177,16 +177,16 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         val btnChooseEndDate = dialogView.findViewById<Button>(R.id.btn_end_date)
 
         btnChooseStartDate.setOnClickListener {
-            pickDate(btnChooseStartDate)
+            Utils.pickDate(this, btnChooseStartDate)
         }
         btnChooseEndDate.setOnClickListener {
-            pickDate(btnChooseEndDate)
+            Utils.pickDate(this, btnChooseEndDate)
         }
 
         dialogBuilder.setView(dialogView)
 
                 .setPositiveButton("Save") { dialog, id ->
-
+//                  overridden
                 }
                 .setNegativeButton("Cancel") { dialog, id ->
                     dialog.cancel()
@@ -225,32 +225,6 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
     }
 
     private fun addTrip(trip: Trip) {
-        MainActivity.database?.tripDao()?.insert(trip)
-    }
-
-    private fun pickDate(btn: Button) {
-        val cal = Calendar.getInstance()
-        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            cal.set(Calendar.YEAR, year)
-            cal.set(Calendar.MONTH, monthOfYear)
-            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            val sdf = SimpleDateFormat(" MMM dd, yyyy", Locale.ENGLISH)
-            btn.text = sdf.format(cal.time)
-        }
-        val dpd = DatePickerDialog(this,
-                dateSetListener,
-                // default to today's date
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH))
-        dpd.datePicker.minDate = (System.currentTimeMillis() - 1000)
-        dpd.show()
-    }
-
-    private fun shakeError(): TranslateAnimation {
-        val shake = TranslateAnimation(0f, 10f, 0f, 0f)
-        shake.duration = 400
-        shake.interpolator = CycleInterpolator(4f)
-        return shake
+        database?.tripDao()?.insertTrip(trip)
     }
 }

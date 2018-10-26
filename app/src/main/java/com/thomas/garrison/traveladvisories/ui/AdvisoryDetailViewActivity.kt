@@ -34,7 +34,6 @@ class AdvisoryDetailViewActivity : AppCompatActivity() {
         setContentView(R.layout.activity_advisory_detail_view)
         setSupportActionBar(toolbar)
         toolbar.title = ""
-//        val country = intent.getStringExtra("country_name")
         val countryCode = intent.getStringExtra("country_code")
 
 

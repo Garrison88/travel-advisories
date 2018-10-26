@@ -10,11 +10,12 @@ interface TripDao {
     fun getAllTrips(): LiveData<List<Trip>>
 
     @Update()
-    fun update(trip : Trip)
+    fun updateTrip(trip : Trip)
 
     @Delete()
-    fun delete(trip : Trip)
+    fun deleteTrip(trip : Trip)
 
     @Insert
-    fun insert(trip: Trip)
+    fun insertTrip(trip: Trip)
+
 }
