@@ -44,6 +44,7 @@ class TripAdapter(private val context: Context,
             itemView.rv_tv_country.text = trip.country
             itemView.rv_tv_start_date.text = "Starts on ${trip.startDate}"
             itemView.rv_tv_end_date.text = "Ends on ${trip.endDate}"
+            itemView.rv_warning.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_warning_24px, 0, 0, 0)
             itemView.rv_warning.visibility =
                     if (trip.hasAdvisory)
                         View.VISIBLE
