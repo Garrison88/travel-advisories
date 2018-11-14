@@ -15,7 +15,7 @@
     <string name="depart_btn_txt">Depart</string>
     <string name="return_btn_txt">Return</string>
     <string name="autocompletetextview_hint">Where to?</string>
-    <string name="view_warning">&#160;View Warning</string>
+    <string name="view_warning">&#160;View Advisory</string>
 
     <string-array name="country_names">
         <item>Afghanistan</item>

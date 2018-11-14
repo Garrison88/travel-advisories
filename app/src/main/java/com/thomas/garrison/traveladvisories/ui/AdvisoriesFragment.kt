@@ -121,7 +121,6 @@ class AdvisoriesFragment : Fragment() {
                     for (code in countriesWithAdvisories) {
                         if (countryCodesArray.contains(code)) {
                             foundAdvisories.add(Advisory(countryNamesArray[countryCodesArray.indexOf(code)], code, ""))
-                            Log.d("!@#$", countryNamesArray[countryCodesArray.indexOf(code)])
                         }
                     }
 
@@ -147,17 +146,13 @@ class AdvisoriesFragment : Fragment() {
 
         // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
-        const val ADVISORY_CODES = "test"
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int
-//                        , advisoryCodes: ArrayList<String>
-        ) =
+        fun newInstance(columnCount: Int ) =
                 AdvisoriesFragment().apply {
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
-//                        putStringArrayList(ADVISORY_CODES, advisoryCodes)
                     }
                 }
     }

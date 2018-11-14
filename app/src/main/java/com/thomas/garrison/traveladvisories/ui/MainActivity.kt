@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity(), AdvisoriesFragment.OnFragmentInteracti
         dialogBuilder.setView(dialogView)
 
                 .setPositiveButton("Save") { dialog, id ->
-//                  overridden
+                    //                  overridden
                 }
                 .setNegativeButton("Cancel") { dialog, id ->
                     dialog.cancel()

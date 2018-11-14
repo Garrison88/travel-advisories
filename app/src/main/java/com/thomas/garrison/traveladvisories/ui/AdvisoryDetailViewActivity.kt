@@ -71,17 +71,19 @@ class AdvisoryDetailViewActivity : AppCompatActivity() {
                     comments.movementMethod = ScrollingMovementMethod()
                     comments.text = response.body()?.comments
                     val code = response.body()?.countryCode?.toLowerCase()
-                    Picasso.with(applicationContext)
+                    Picasso.get()
                             .load("https://www.countryflags.io/$code/flat/64.png")
                             .resize(0, flagImage.height)
                             .into(flagImage, object : com.squareup.picasso.Callback {
+                                override fun onError(e: Exception?) {
+
+                                }
+
                                 override fun onSuccess() {
                                     pBar.visibility = View.GONE
                                 }
 
-                                override fun onError() {
 
-                                }
                             })
                 }
             }

@@ -94,7 +94,7 @@ class TripFragment : Fragment() {
 
         val countryNamesArray = resources.getStringArray(R.array.country_names)
         val countryCodesArray = resources.getStringArray(R.array.country_codes)
-        val adapter = ArrayAdapter(context, android.R.layout.select_dialog_item, countryNamesArray)
+        val adapter = ArrayAdapter(context!!, android.R.layout.select_dialog_item, countryNamesArray)
         val autoCompleteTextView = dialogView.findViewById<AutoCompleteTextView>(R.id.auto_tv_countries)
         autoCompleteTextView.threshold = 1
         autoCompleteTextView.setAdapter(adapter)
